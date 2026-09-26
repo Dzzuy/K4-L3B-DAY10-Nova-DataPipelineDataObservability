@@ -7,3 +7,8 @@ lab/
 **/__pycache__/
 doc_verification_report.md
 Lab 10.md
+Lab-10-guide.txt
+Task division.md
+data/chroma/*
+!data/chroma/.gitkeep
+data/embeddings/*.json
