@@ -31,8 +31,8 @@ def _rebuild_text_for_embedding(df: pd.DataFrame, indices: list[int]) -> None:
             [
                 f"Title: {row.get('title', '')}",
                 f"Authors: {row.get('authors_joined', '')}",
-                f"Categories: {row.get('categories_joined', '')}",
                 f"Published: {row.get('published', '')}",
+                f"Categories: {row.get('categories_joined', '')}",
                 f"Summary: {row.get('summary', '')}",
             ]
         )

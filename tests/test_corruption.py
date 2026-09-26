@@ -13,18 +13,29 @@ def _clean_dataframe(row_count: int = 24) -> pd.DataFrame:
     for index in range(row_count):
         published = pd.Timestamp("2026-09-01") - pd.Timedelta(days=index)
         summary = f"Summary for paper {index} with enough content for data quality checks."
+        title = f"A sufficiently descriptive paper title {index}"
+        authors = "Author One, Author Two"
+        categories = "Artificial Intelligence, Retrieval"
         rows.append(
             {
                 "paper_id": f"paper-{index:02d}",
-                "title": f"A sufficiently descriptive paper title {index}",
+                "title": title,
                 "summary": summary,
-                "authors_joined": "Author One, Author Two",
-                "categories_joined": "Artificial Intelligence, Retrieval",
+                "authors_joined": authors,
+                "categories_joined": categories,
                 "published": published.date().isoformat(),
                 "updated": published.date().isoformat(),
                 "age_days": index + 1,
                 "summary_chars": len(summary),
-                "text_for_embedding": f"Original embedding text {index}",
+                "text_for_embedding": "\n".join(
+                    (
+                        f"Title: {title}",
+                        f"Authors: {authors}",
+                        f"Published: {published.date().isoformat()}",
+                        f"Categories: {categories}",
+                        f"Summary: {summary}",
+                    )
+                ),
                 "abs_url": f"https://example.com/{index}",
                 "pdf_url": f"https://example.com/{index}.pdf",
             }
@@ -70,6 +81,17 @@ def test_corrupt_clean_dataframe_applies_all_scenarios(tmp_path):
     assert (corrupted["title"].str.len() == 7).any()
     assert (corrupted["age_days"] > original["age_days"].max()).any()
     assert (corrupted["summary_chars"] == corrupted["summary"].str.len()).all()
+    for row in corrupted.itertuples():
+        expected_text = "\n".join(
+            (
+                f"Title: {row.title}",
+                f"Authors: {row.authors_joined}",
+                f"Published: {row.published}",
+                f"Categories: {row.categories_joined}",
+                f"Summary: {row.summary}",
+            )
+        )
+        assert row.text_for_embedding == expected_text
 
     for change in scenarios["stale_publication_date"]["changes"]:
         before = pd.Timestamp(change["before"])
