@@ -4,39 +4,39 @@
 
 ## 1. Thông tin cá nhân
 
-| Thông tin         | Nội dung                  |
-| ------------------ | -------------------------- |
-| Họ và tên       | [Họ và tên]             |
-| MSSV               | [MSSV]                     |
-| Khóa/Lớp         | [K3 hoặc K4]              |
-| Tên nhóm         | [Tên hoặc mã nhóm]     |
-| Vai trò chính    | [Vai trò]                 |
-| Repository         | [Đường dẫn repository] |
-| Ngày hoàn thành | [YYYY-MM-DD]               |
+| Thông tin       | Nội dung               |
+| --------------- | ---------------------- |
+| Họ và tên       | [Họ và tên]            |
+| MSSV            | [MSSV]                 |
+| Khóa/Lớp        | [K3 hoặc K4]           |
+| Tên nhóm        | [Tên hoặc mã nhóm]     |
+| Vai trò chính   | [Vai trò]              |
+| Repository      | [Đường dẫn repository] |
+| Ngày hoàn thành | [YYYY-MM-DD]           |
 
 ## 2. Vai trò và phạm vi công việc
 
 ### Phần việc sở hữu
 
-| Module/deliverable | File/hàm phụ trách | Input nhận vào | Output bàn giao  | Trạng thái                                 |
-| ------------------ | --------------------- | ---------------- | ----------------- | -------------------------------------------- |
-| [Phần việc]      | [File/hàm]           | [Input]          | [Output/artifact] | [Hoàn thành/Một phần/Chưa hoàn thành] |
-| [Phần việc]      | [File/hàm]           | [Input]          | [Output/artifact] | [Hoàn thành/Một phần/Chưa hoàn thành] |
+| Module/deliverable | File/hàm phụ trách | Input nhận vào | Output bàn giao   | Trạng thái                            |
+| ------------------ | ------------------ | -------------- | ----------------- | ------------------------------------- |
+| [Phần việc]        | [File/hàm]         | [Input]        | [Output/artifact] | [Hoàn thành/Một phần/Chưa hoàn thành] |
+| [Phần việc]        | [File/hàm]         | [Input]        | [Output/artifact] | [Hoàn thành/Một phần/Chưa hoàn thành] |
 
 Chỉ nhận ownership cho phần bạn trực tiếp thực hiện. Liên hệ rõ phần việc của bạn với đầu vào, đầu ra và các thành viên phụ thuộc vào phần đó.
 
 ### Việc hỗ trợ ngoài phạm vi chính
 
-| Hoạt động                         | Thành viên/module được hỗ trợ | Kết quả                    |
-| ------------------------------------ | ------------------------------------ | ---------------------------- |
-| [Debug/tích hợp/tài liệu] | [Tên hoặc module] | [Kết quả và bằng chứng] |
+| Hoạt động                 | Thành viên/module được hỗ trợ | Kết quả                 |
+| ------------------------- | ----------------------------- | ----------------------- |
+| [Debug/tích hợp/tài liệu] | [Tên hoặc module]             | [Kết quả và bằng chứng] |
 
 ## 3. Kết quả theo vai trò
 
-| Nhiệm vụ đã thực hiện | File/hàm/artifact liên quan | Kết quả bàn giao       | Cách xác minh         |
-| --------------------------- | ----------------------------- | ------------------------- | ----------------------- |
-| [Mô tả cụ thể] | [Đường dẫn file] | [Artifact/metrics/report] | [Lệnh/artifact] |
-| [Mô tả cụ thể] | [Đường dẫn file] | [Artifact/metrics/report] | [Lệnh/artifact] |
+| Nhiệm vụ đã thực hiện | File/hàm/artifact liên quan | Kết quả bàn giao          | Cách xác minh   |
+| --------------------- | --------------------------- | ------------------------- | --------------- |
+| [Mô tả cụ thể]        | [Đường dẫn file]            | [Artifact/metrics/report] | [Lệnh/artifact] |
+| [Mô tả cụ thể]        | [Đường dẫn file]            | [Artifact/metrics/report] | [Lệnh/artifact] |
 
 Nêu một output cụ thể mà phần việc của bạn tạo ra hoặc giúp xác minh:
 
@@ -54,12 +54,12 @@ Nêu một output cụ thể mà phần việc của bạn tạo ra hoặc giúp
 
 ### Input, output và contract
 
-| Thành phần                   | Mô tả                                     |
-| ------------------------------ | ------------------------------------------- |
-| Input                          | [Schema, artifact hoặc tham số]           |
-| Output                         | [Schema, artifact hoặc giá trị trả về] |
-| Module phụ thuộc             | [Module/file liên quan]                    |
-| Module sử dụng output        | [Module/file liên quan]                    |
+| Thành phần              | Mô tả                                  |
+| ----------------------- | -------------------------------------- |
+| Input                   | [Schema, artifact hoặc tham số]        |
+| Output                  | [Schema, artifact hoặc giá trị trả về] |
+| Module phụ thuộc        | [Module/file liên quan]                |
+| Module sử dụng output   | [Module/file liên quan]                |
 | Điều kiện lỗi cần xử lý | [Trường hợp thực tế]                   |
 
 ### Cách xác minh
@@ -113,14 +113,14 @@ Giải thích ngắn gọn bằng lời của bạn:
 
 ### Metrics chính
 
-| Metric/signal          | Baseline | Corrupted | Repaired | Nhận xét của cá nhân |
-| ---------------------- | -------: | --------: | -------: | ------------------------- |
-| `retrieval_hit_rate` |      [ ] |       [ ] |      [ ] | [Nhận xét]              |
-| `mean_token_f1`      |      [ ] |       [ ] |      [ ] | [Nhận xét]              |
-| `judge_accuracy`     |      [ ] |       [ ] |      [ ] | [Nhận xét]              |
-| `mean_judge_score`   |      [ ] |       [ ] |      [ ] | [Nhận xét]              |
-| Quality checks         |      [ ] |       [ ] |      [ ] | [Nhận xét]              |
-| Freshness status       |      [ ] |       [ ] |      [ ] | [Nhận xét]              |
+| Metric/signal        | Baseline | Corrupted | Repaired | Nhận xét của cá nhân |
+| -------------------- | -------: | --------: | -------: | -------------------- |
+| `retrieval_hit_rate` |      [ ] |       [ ] |      [ ] | [Nhận xét]           |
+| `mean_token_f1`      |      [ ] |       [ ] |      [ ] | [Nhận xét]           |
+| `judge_accuracy`     |      [ ] |       [ ] |      [ ] | [Nhận xét]           |
+| `mean_judge_score`   |      [ ] |       [ ] |      [ ] | [Nhận xét]           |
+| Quality checks       |      [ ] |       [ ] |      [ ] | [Nhận xét]           |
+| Freshness status     |      [ ] |       [ ] |      [ ] | [Nhận xét]           |
 
 ### Kết luận từ số liệu
 
