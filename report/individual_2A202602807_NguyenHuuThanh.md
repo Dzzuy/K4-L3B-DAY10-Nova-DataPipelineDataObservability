@@ -6,7 +6,7 @@
 | --------------- | ---------------------------------------------------------------------------- |
 | Họ và tên       | Nguyễn Hữu Thành                                                             |
 | MSSV            | 2A202602807                                                                  |
-| Khóa/Lớp        | K4                                                                           |
+| Khóa/Lớp        | K4-L3B                                                                       |
 | Tên nhóm        | Nova                                                                         |
 | Vai trò chính   | Data ingestion & cleaning owner                                              |
 | Repository      | https://github.com/Dzzuy/K4-L3B-DAY10-Nova-DataPipelineDataObservability.git |
