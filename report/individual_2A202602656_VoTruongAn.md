@@ -42,7 +42,7 @@
 | Tự động sinh báo cáo đối chiếu 3 trạng thái | `src/observability/reporting.py`<br>`generate_corruption_report` | Báo cáo Markdown `data/reports/corruption_report.md` so sánh chi tiết Baseline vs Corrupted vs Repaired kèm phân tích nhân quả. | Bảng so sánh 3 trạng thái hiển thị đầy đủ độ sụt giảm khi dính lỗi và độ phục hồi sau khi sửa chữa. |
 
 **Output cụ thể chứng minh năng lực module:**
-Hàm `run_data_quality_checks` chặn đứng 100% dữ liệu bẩn khi bị tiêm 6 kịch bản corruption (trùng ID, thiếu text embedding, summary quá ngắn, bài quá hạn) và trả về `success = False`, sau đó xác nhận dữ liệu đã hoàn toàn sạch sẽ sau bước Idempotent Repair với `success = True`.
+Hàm `run_data_quality_checks` phát hiện các vi phạm mà suite được cấu hình để kiểm tra: `paper_id` trùng, summary dưới 30 ký tự và Freshness SLA vượt ngưỡng. Corrupted data trả về `success = False`; repaired data được rebuild từ raw snapshot và trả về `success = True`. Noise trong summary và title bị cắt không có expectation riêng, nên tác động của chúng được quan sát qua retrieval/answer metrics thay vì kết luận GX trực tiếp phát hiện.
 
 ---
 
@@ -55,7 +55,7 @@ Trong một hệ thống RAG thực tế, dữ liệu từ các nguồn mở (nh
 2. Dữ liệu trùng lặp `paper_id` gây sai lệch điểm tương đồng và phân phối retrieval.
 3. Dữ liệu quá hạn (stale data) khiến câu trả lời của AI bị lỗi thời so với thực tế.
 
-Module Observability đóng vai trò là "người gác cổng", đảm bảo chỉ dữ liệu đạt chuẩn data contract mới được đưa vào bước Indexing.
+Module Observability cung cấp tín hiệu kiểm dịch để pipeline quyết định có cho dữ liệu đi tiếp hay không. Trong implementation hiện tại, pipeline vẫn build index rồi ghi quality/report artifacts; ở production nên dùng `success=False` làm điều kiện chặn serving hoặc kích hoạt repair tự động.
 
 ### Cách triển khai
 
@@ -97,7 +97,7 @@ python -c "from core.config import load_settings; from observability.quality imp
 
 - **Kết quả mong đợi:** In ra `Tín hiệu hoàn thành: Quality check status = True` và file `data/quality/test.json` được tạo.
 - **Kết quả thực tế:** In đúng chuỗi `Tín hiệu hoàn thành: Quality check status = True`.
-- **Artifact:** `data/quality/baseline_quality_report.json`, `data/quality/freshness_report.json`.
+- **Artifact:** `data/quality/baseline.json`, `data/quality/freshness_report.json`.
 
 ---
 
@@ -156,22 +156,22 @@ python -c "from core.config import load_settings; from observability.quality imp
 
 | Metric / Tín hiệu | Baseline | Corrupted | Repaired | Nhận xét của cá nhân |
 | :--- | :---: | :---: | :---: | :--- |
-| `retrieval_hit_rate` | 1.0000 | 0.4000 | 1.0000 | Hit rate sụt giảm mạnh (-0.6) khi bị corrupt và phục hồi nguyên vẹn sau repair |
-| `mean_token_f1` | 0.8542 | 0.2500 | 0.8542 | Khả năng trả lời đúng từ khóa giảm sâu khi embedding bị nhiễu và thiếu context |
-| `judge_accuracy` | 0.9000 | 0.3000 | 0.9000 | LLM Judge đánh giá tỷ lệ trả lời đúng giảm tới 60% khi dính dữ liệu lỗi |
-| `mean_judge_score` | 4.60 | 1.80 | 4.60 | Điểm trung bình trượt từ mức Xuất sắc (4.6) xuống mức Kém (1.8) |
+| `retrieval_hit_rate` | 1.0000 | 0.8000 | 1.0000 | Corruption làm mất 2/10 retrieval hits; repair phục hồi toàn bộ |
+| `mean_token_f1` | 1.0000 | 0.7000 | 1.0000 | Chất lượng câu trả lời giảm 0.3 rồi trở lại baseline |
+| `judge_accuracy` | 1.0000 | 0.7000 | 1.0000 | LLM Judge xác nhận ba câu corrupted không materially correct |
+| `mean_judge_score` | 5.00 | 4.00 | 5.00 | Corrupted answers vẫn còn một phần thông tin đúng; repaired đạt lại điểm tối đa |
 | Quality checks (GX) | PASS | FAIL | PASS | Bắt trúng lỗi schema vi phạm (trùng lặp ID, summary ngắn) |
 | Freshness status | FRESH | STALE | FRESH | Cảnh báo kịp thời khi bài báo bị lùi ngày xuất bản > 180 ngày |
 
 ### Kết luận từ số liệu
 
 1. **Chuỗi nhân quả 1 (Tác động của Corruption):**
-   Tiêm dữ liệu bẩn (Blank summary, noise, truncate) → Great Expectations báo `summary_min_length` FAIL, Freshness SLA báo STALE → Vector embeddings bị méo ngữ cảnh → `retrieval_hit_rate` sụp đổ từ 1.0 xuống 0.4, kéo theo `mean_token_f1` giảm xuống 0.25.
+   Tiêm sáu corruption làm dataset giảm từ 24 xuống 21 rows, tạo duplicate, summary rỗng và 6 stale records → Great Expectations báo uniqueness/summary FAIL, Freshness SLA báo STALE → `retrieval_hit_rate` giảm từ 1.0 xuống 0.8, `mean_token_f1` và `judge_accuracy` giảm xuống 0.7.
 2. **Chuỗi nhân quả 2 (Cơ chế Repair):**
    Khôi phục idempotent từ snapshot thô `crossref_records.json` → Tái tạo sạch sẽ `text_for_embedding` và `age_days` → Quality checks và Freshness hồi phục 100% PASS → Vector store được index lại đưa `retrieval_hit_rate` hồi phục về 1.0.
 
 - **Kịch bản corruption ảnh hưởng rõ nhất:**
-  Kịch bản *Blank summary* và *Inject noise* ảnh hưởng nặng nề nhất đến vector search vì nó trực tiếp phá hủy nội dung của trường `text_for_embedding`, khiến vector index không thể tìm ra bài báo phù hợp cho câu hỏi.
+  Suite hiện áp dụng đồng thời cả sáu lỗi nên chưa đủ bằng chứng để xếp hạng tác động riêng của từng scenario. Quan sát trực tiếp cho thấy drop latest làm mất ground-truth documents, blank summary làm giảm answer content, duplicate phá uniqueness và stale date làm tỷ lệ stale vượt 25%. Muốn kết luận lỗi nào ảnh hưởng mạnh nhất cần chạy ablation từng scenario trên cùng test set.
 
 ---
 

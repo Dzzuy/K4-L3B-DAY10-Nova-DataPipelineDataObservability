@@ -32,7 +32,7 @@ _Báo cáo phần việc của Duy trong nhóm Nova, hoàn thành ngày 26/09/20
 | --- | --- | --- |
 | Tích hợp branch observability | An — `quality.py`, `reporting.py` | Ghép quality, freshness và reporting vào CP3 rồi chạy lại toàn tuyến |
 | Kiểm tra đầu vào CP1 | Thanh — ingestion và cleaning | Xác nhận 24 dòng sạch, 24 `paper_id` duy nhất và không thiếu trường dùng cho benchmark |
-| Cấu hình LLM evaluation | Evaluation pipeline | Chuyển sang OpenRouter và xác nhận 10 lượt judge không dùng fallback |
+| Xác minh LLM evaluation | Evaluation pipeline | Đối chiếu cấu hình cuối OpenAI `gpt-4o-mini` và xác nhận judge không dùng fallback |
 
 Tôi không nhận ownership đối với `crossref.py`, `cleaning.py`, `quality.py`, `reporting.py`, `corruption.py` hoặc `corruption_flow.py`. Đây là phần việc của các thành viên khác.
 
@@ -46,7 +46,7 @@ Tôi không nhận ownership đối với `crossref.py`, `cleaning.py`, `quality
 | Kiểm tra retrieval và answer quality | `baseline_metrics.json` | Hit Rate 1.0, Token F1 1.0 | Đối chiếu file metrics và answers |
 | Tích hợp quality gate | `baseline.json`, `phase1_report.md` | GX pass, freshness pass | Đối chiếu quality artifact và report |
 
-Output chính trong phần việc của tôi là bộ benchmark 10 câu và baseline pipeline chạy end-to-end. Lần chạy gần nhất ghi nhận 24 raw records, 24 clean records, 24 documents trong Chroma và 10 mẫu evaluation. Các baseline metrics đều đạt 1.0; LLM judge chấm điểm trung bình 5/5 và không có lượt nào dùng fallback.
+Output chính trong phần việc của tôi là bộ benchmark 10 câu và baseline pipeline chạy end-to-end. Lần chạy cuối ghi nhận 24 raw records, 24 clean records, 24 documents trong Chroma và 10 mẫu evaluation. Các baseline metrics đều đạt 1.0; LLM judge chấm điểm trung bình 5/5 và không có lượt nào dùng fallback. Sau khi CP4-CP5 của Khánh được tích hợp, tôi dùng lại chính benchmark này để đối chiếu công bằng ba trạng thái baseline, corrupted và repaired.
 
 Các commit chính dùng làm bằng chứng:
 
@@ -156,21 +156,23 @@ flowchart LR
 
 | Metric/signal | Baseline | Corrupted | Repaired | Nhận xét cá nhân |
 | --- | ---: | ---: | ---: | --- |
-| `retrieval_hit_rate` | 1.0 | Chưa có artifact | Chưa có artifact | Baseline truy xuất đúng document cho cả 10 câu |
-| `mean_token_f1` | 1.0 | Chưa có artifact | Chưa có artifact | Câu trả lời baseline khớp ground truth hiện tại |
-| `judge_accuracy` | 1.0 | Chưa có artifact | Chưa có artifact | 10 câu đều được judge đánh giá đúng |
-| `mean_judge_score` | 5.0 | Chưa có artifact | Chưa có artifact | Điểm trung bình tối đa trong lần chạy baseline |
-| Quality checks | PASS | Chưa có artifact | Chưa có artifact | Sáu check chính và freshness đều pass |
-| Freshness status | FRESH | Chưa có artifact | Chưa có artifact | 0/24 papers stale theo ngưỡng 180 ngày |
+| `retrieval_hit_rate` | 1.0 | 0.8 | 1.0 | Corruption làm mất 2/10 retrieval hits; repair phục hồi toàn bộ |
+| `mean_token_f1` | 1.0 | 0.7 | 1.0 | Chất lượng câu trả lời giảm 0.3 rồi trở lại baseline |
+| `judge_accuracy` | 1.0 | 0.7 | 1.0 | LLM judge xác nhận ba câu corrupted không materially correct |
+| `mean_judge_score` | 5.0 | 4.0 | 5.0 | Corrupted answers vẫn còn một phần thông tin đúng; repair đạt lại điểm tối đa |
+| Quality checks | PASS | FAIL | PASS | Corrupted data vi phạm uniqueness và summary length; repaired data đạt lại toàn bộ checks |
+| Freshness status | FRESH | STALE | FRESH | Stale ratio thay đổi 0% → 28.57% → 0% |
 
 ### Kết luận từ số liệu
 
-Baseline đã được kiểm chứng bằng artifacts thực tế. Tuy nhiên, tại thời điểm hoàn thành báo cáo, repository chưa có `corrupted_metrics.json`, `repaired_metrics.json` và `corruption_report.md`. Vì vậy tôi chưa kết luận corruption nào ảnh hưởng mạnh nhất và chưa kết luận repair đã phục hồi metrics.
+Baseline, corrupted và repaired hiện đã có đủ artifacts trên `main` và được đánh giá bằng cùng `data/eval/test_set.json`. CP4-CP5 thuộc ownership của Khánh; trong vai trò baseline/evaluation owner, tôi đối chiếu kết quả cuối với benchmark CP2-CP3 do mình triển khai.
 
-Hai chuỗi nguyên nhân–bằng chứng sẽ được hoàn thiện sau khi CP4–CP5 có artifact:
+Hai chuỗi nguyên nhân–bằng chứng:
 
-1. Data corruption → quality/freshness signal thay đổi → retrieval và answer metrics thay đổi.
-2. Repair từ raw snapshot → quality/freshness phục hồi → metrics repaired được đối chiếu với baseline.
+1. Sáu corruption làm dữ liệu giảm từ 24 xuống 21 rows, tạo duplicate, summary rỗng và 6 stale records → Quality Gate/Freshness chuyển PASS/FRESH thành FAIL/STALE → retrieval hit rate giảm từ 1.0 xuống 0.8, token F1 và judge accuracy giảm xuống 0.7.
+2. Repair rebuild từ raw snapshot tạo lại 24 unique rows và 0 stale records → Quality Gate/Freshness trở lại PASS/FRESH → retrieval hit rate, token F1 và judge accuracy cùng trở lại 1.0.
+
+Không thể quy toàn bộ mức giảm cho một corruption riêng lẻ vì sáu lỗi được áp dụng đồng thời. Quan sát artifacts cho thấy drop latest làm mất ground-truth documents, blank summary làm giảm answer content, duplicate phá uniqueness và stale date làm SLA vượt ngưỡng 25%.
 
 Kết quả khác với kỳ vọng ban đầu là baseline đạt tuyệt đối trên cả Hit Rate và Token F1. Nguyên nhân hợp lý là câu hỏi chứa chính xác title và `answer_question()` ưu tiên exact-title lookup trước semantic results. Đây là baseline phù hợp để kiểm tra pipeline, nhưng chưa đủ khó để đánh giá retrieval khi câu hỏi không chứa title.
 
@@ -195,7 +197,7 @@ Tôi sẽ bổ sung một nhóm câu hỏi paraphrase không chứa nguyên văn
 - [x] Báo cáo không chứa `.env`, API key, token hoặc secret.
 - [x] Báo cáo này không phải bản sao nguyên văn của báo cáo nhóm hoặc báo cáo thành viên khác.
 
-**Họ và tên:** Duy
+**Họ và tên:** Phạm Đình Duy
 
 **Ngày xác nhận:** 2026-09-26
 
