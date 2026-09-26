@@ -12,7 +12,7 @@
 | ---: | --- | --- | --- | --- | --- |
 | 1 | Nguyễn Hữu Thành | 2A202602807 | `hthanh1412004@gmail.com` | Data Ingestion & Cleaning Owner, CP0-CP1 | [`individual_2A202602807_NguyenHuuThanh.md`](../report/individual_2A202602807_NguyenHuuThanh.md) |
 | 2 | Võ Trường An | 2A202602656 | `gaming13102004@gmail.com` | Data Observability & Reporting Owner, CP1 và reporting CP3/CP5 | [`individual_2A202602656_VoTruongAn.md`](../report/individual_2A202602656_VoTruongAn.md) |
-| 3 | Phạm Đình Duy | 2A202602913 | `Dzzuy@users.noreply.github.com` | Evaluation & Baseline Pipeline Owner, CP2-CP3 | [`individual_2A202602913_PhamDinhDuy.md`](../report/individual_2A202602913_PhamDinhDuy.md) |
+| 3 | Phạm Đình Duy | 2A202602913 | `kit925969@gmail.com` | Evaluation & Baseline Pipeline Owner, CP2-CP3 | [`individual_2A202602913_PhamDinhDuy.md`](../report/individual_2A202602913_PhamDinhDuy.md) |
 | 4 | Trần Ngọc Khánh | 2A202602923 | `khanhtran004@gmail.com` | Corruption & Recovery Pipeline Owner, CP4-CP5 | [`individual_2A202602923_TranNgocKhanh.md`](../report/individual_2A202602923_TranNgocKhanh.md) |
 
 ## Phân công và đóng góp cá nhân
