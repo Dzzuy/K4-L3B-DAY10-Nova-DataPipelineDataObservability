@@ -1,0 +1,25 @@
+{
+  "report_name": "repaired",
+  "stage": "repaired",
+  "success": true,
+  "passed": true,
+  "gx_success": true,
+  "total_rows": 24,
+  "checks": {
+    "row_count": true,
+    "paper_id_not_null": true,
+    "paper_id_unique": true,
+    "title_not_null": true,
+    "text_for_embedding_not_null": true,
+    "summary_min_length": true,
+    "freshness": true
+  },
+  "freshness": {
+    "latest_published": "2026-09-15",
+    "oldest_published": "2026-04-01",
+    "stale_rows": 0,
+    "total_rows": 24,
+    "stale_ratio": 0.0,
+    "is_fresh": true
+  }
+}
