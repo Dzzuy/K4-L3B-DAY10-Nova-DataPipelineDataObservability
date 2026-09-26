@@ -19,7 +19,7 @@ def _format_diff(after: Any, before: Any) -> str:
 
 
 def generate_phase1_report(
-    report_path,
+    report_path: Path | str,
     source_summary: dict[str, Any],
     metrics: dict[str, Any],
     quality: dict[str, Any],
